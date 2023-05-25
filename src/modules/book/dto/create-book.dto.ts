@@ -5,8 +5,8 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { User } from '../../auth/schemas/user.schema';
 import { Category } from '../schemas/book.schema';
+import { User } from 'src/modules/user/schemas/user.schema';
 
 export class CreateBookDto {
   @IsNotEmpty()
