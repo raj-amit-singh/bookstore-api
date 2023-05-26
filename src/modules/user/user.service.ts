@@ -17,7 +17,7 @@ export class UserService {
 	}
 
 	public async findById(_id: string): Promise<User> {
-		const user: User = await this.userModel.findById(_id).lean();
+		const user: User = await this.userModel.findById(_id, {password: false}).lean();
 		return user;
 	}
 

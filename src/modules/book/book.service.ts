@@ -7,10 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Book } from './schemas/book.schema';
 
-import { Query } from 'express-serve-static-core';
 import { User } from '../user/schemas/user.schema';
 import { PaginatedBooksDto } from './dto/paginated-books.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { PaginationQuery } from './dto/pagination-query';
 
 @Injectable()
 export class BookService {
@@ -18,6 +18,28 @@ export class BookService {
     @InjectModel(Book.name)
     private bookModel: mongoose.Model<Book>,
   ) {}
+
+  async findAll(query: PaginationQuery): Promise<Book[]> {
+
+    const safeLimit = parseInt(query.limit.toString()) || 25;
+		const safePage = parseInt(query.page.toString()) || 1;
+    const skip = safePage * (query.page - 1);
+
+    const keyword = query.query
+      ? {
+          title: {
+            $regex: query.query,
+            $options: 'i',
+          },
+        }
+      : {};
+
+    const books = await this.bookModel
+      .find({ ...keyword })
+      .limit(safeLimit)
+      .skip(skip);
+    return books;
+  }
 
   // get books/query/:key
 	public async queryBooks(

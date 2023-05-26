@@ -14,8 +14,6 @@ import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './schemas/book.schema';
-
-import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
 import { PaginationDto } from './dto/pagination.dto';
 import { PaginationQuery } from './dto/pagination-query';
@@ -24,6 +22,12 @@ import { PaginationQuery } from './dto/pagination-query';
 export class BookController {
   constructor(private bookService: BookService) {}
   
+  @Get()
+  async getAllBooks(@Query() query: PaginationQuery): Promise<Book[]> {
+    return this.bookService.findAll(query);
+  }
+
+
 	@Get('query')
 	public async queryBooks(
 		@Query() paginationQuery: PaginationQuery

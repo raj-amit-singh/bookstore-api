@@ -5,6 +5,9 @@ export class PaginationQuery {
 
     @IsString()
     @IsOptional()
+    @ApiProperty({
+        required: false
+    })
     query: string;
 
     @ApiProperty({

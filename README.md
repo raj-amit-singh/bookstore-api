@@ -13,7 +13,6 @@ Visit demo for client side at : [https://bookstore778.netlify.app/](https://book
 - Front-end
   - Angular 16
   - CSS
-  - Cypress (testing)
 
 ## Features
 - **MongoDB** for database cloud
@@ -22,5 +21,6 @@ Visit demo for client side at : [https://bookstore778.netlify.app/](https://book
 
 ## Issues
 - **Effective Config** - Not able to setup effective config
-
+- **Signup** - Need to fix singup bugs
+- **Purchase** - Need to add cart and purchase
 
