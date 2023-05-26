@@ -19,6 +19,12 @@ async function bootstrap() {
 		}),
 	);
 
+	app.enableCors({
+		origin: true,
+		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+		credentials: true,
+	});
+
 	app.setGlobalPrefix('api');
 	if (process.env.NODE_ENV !== 'prod') {
 		setupSwagger(app);

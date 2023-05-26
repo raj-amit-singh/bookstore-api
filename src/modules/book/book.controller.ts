@@ -17,15 +17,28 @@ import { Book } from './schemas/book.schema';
 
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginationDto } from './dto/pagination.dto';
+import { PaginationQuery } from './dto/pagination-query';
 
 @Controller('books')
 export class BookController {
   constructor(private bookService: BookService) {}
-
-  @Get()
-  async getAllBooks(@Query() query: ExpressQuery): Promise<Book[]> {
-    return this.bookService.findAll(query);
-  }
+  
+	@Get('query')
+	public async queryBooks(
+		@Query() paginationQuery: PaginationQuery
+	) {
+		if (!paginationQuery.limit) {
+			return await this.bookService.queryBooks(paginationQuery.query);
+		}
+		const safeLimit = parseInt(paginationQuery.limit.toString()) || 25;
+		const safePage = parseInt(paginationQuery.page.toString()) || 1;
+		const pagination: PaginationDto = {
+			limit: safeLimit,
+			page: safePage,
+		};
+		return await this.bookService.queryBooks(paginationQuery.query, pagination);
+	}
 
   @Post()
   @UseGuards(AuthGuard())

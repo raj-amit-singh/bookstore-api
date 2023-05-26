@@ -9,6 +9,8 @@ import { Book } from './schemas/book.schema';
 
 import { Query } from 'express-serve-static-core';
 import { User } from '../user/schemas/user.schema';
+import { PaginatedBooksDto } from './dto/paginated-books.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class BookService {
@@ -17,27 +19,46 @@ export class BookService {
     private bookModel: mongoose.Model<Book>,
   ) {}
 
-  async findAll(query: Query): Promise<Book[]> {
-    const resPerPage = 2;
-    const currentPage = Number(query.page) || 1;
-    const skip = resPerPage * (currentPage - 1);
+  // get books/query/:key
+	public async queryBooks(
+		q: string,
+		pagination?: PaginationDto,
+	): Promise<PaginatedBooksDto> {
+		const count = await this.bookModel.countDocuments({
+			$text: { $search: `\"${q}\"` },
+		});
+		const limit = pagination?.limit || 25;
+		const page = pagination?.page || 1;
 
-    const keyword = query.keyword
-      ? {
-          title: {
-            $regex: query.keyword,
-            $options: 'i',
-          },
-        }
-      : {};
+		const books: Book[] = await this.bookModel
+			.find({ $text: { $search: `\"${q}\"` } })
+			.skip((page - 1) * limit)
+			.limit(limit)
+			.lean();
 
-    const books = await this.bookModel
-      .find({ ...keyword })
-      .limit(resPerPage)
-      .skip(skip);
-    return books;
-  }
+		return { count, books };
+	}
 
+  	// get books/genre/:genre
+	public async findManyByGenre(
+		genre: string,
+		pagination?: PaginationDto,
+	): Promise<PaginatedBooksDto> {
+		const count = await this.bookModel.countDocuments({ genre });
+		let books: Book[];
+		if (!pagination) {
+			books = await this.bookModel.find({}).lean();
+		} else {
+			const { limit, page } = pagination;
+			books = await this.bookModel
+				.find({ genre: genre })
+				.skip((page - 1) * limit)
+				.limit(limit)
+				.lean();
+		}
+		return { count, books };
+	}
+  
   async create(book: Book, user: User): Promise<Book> {
     const data = Object.assign(book, { user: user._id });
 
@@ -52,7 +73,7 @@ export class BookService {
       throw new BadRequestException('Please enter correct id.');
     }
 
-    const book = await this.bookModel.findById(id);
+    const book:Book = await this.bookModel.findById(id).lean();
 
     if (!book) {
       throw new NotFoundException('Book not found.');
@@ -60,6 +81,16 @@ export class BookService {
 
     return book;
   }
+
+  // get books/search/:key
+
+	public async searchBooks(q: string): Promise<Book[]> {
+		const books: Book[] = await this.bookModel
+			.find({ $text: { $search: `\"${q}\"` } })
+			.limit(10)
+			.lean();
+		return books;
+	}
 
   async updateById(id: string, book: Book): Promise<Book> {
     return await this.bookModel.findByIdAndUpdate(id, book, {

@@ -11,11 +11,15 @@ import { User } from 'src/modules/user/schemas/user.schema';
 export class CreateBookDto {
   @IsNotEmpty()
   @IsString()
-  readonly title: string;
+readonly title: string;
 
   @IsNotEmpty()
   @IsString()
   readonly description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly imgURL: string;
 
   @IsNotEmpty()
   @IsString()

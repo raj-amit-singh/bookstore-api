@@ -13,16 +13,20 @@ export enum Category {
   timestamps: true,
 })
 export class Book {
-  @Prop()
-  title: string;
+
+	@Prop({ index: true })
+	title: string;
+
+	@Prop({ index: true })
+	author: string;
 
   @Prop()
   description: string;
+  
+  @Prop({  })
+	imgURL: string;
 
-  @Prop()
-  author: string;
-
-  @Prop()
+  @Prop({type: Number})
   price: number;
 
   @Prop()
@@ -31,5 +35,5 @@ export class Book {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 }
-
 export const BookSchema = SchemaFactory.createForClass(Book);
+BookSchema.index({ title: 'text' });

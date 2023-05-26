@@ -13,6 +13,9 @@ export class User extends Document {
 
   @Prop()
   password: string;
+
+  @Prop({ type: Array, default: [] })
+	cart: any[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
